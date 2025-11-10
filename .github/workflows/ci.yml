@@ -4,7 +4,8 @@ on:
   push:
     branches: ["**"]
 
-# Keep this only if you want ZAP to open GitHub issues.
+# Keep this ONLY if you want ZAP to open GitHub issues automatically.
+# If you don't care, delete this whole permissions block or set GITHUB_TOKEN: "" in the ZAP step below.
 permissions:
   contents: read
   issues: write
@@ -42,7 +43,7 @@ jobs:
 
       - name: ZAP Baseline DAST
         uses: zaproxy/action-baseline@v0.15.0
-        # If you do NOT want GitHub Issues created by ZAP, uncomment:
+        # If you do NOT want GitHub Issues created by ZAP, uncomment the next 3 lines:
         # env:
         #   GITHUB_TOKEN: ""
         with:
