@@ -3,25 +3,9 @@ import time
 import logging
 from typing import Any, Dict
 
-from slowapi import Limiter
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-from fastapi.responses import JSONResponse
-
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
-@app.exception_handler(RateLimitExceeded)
-def rate_limit_handler(request, exc):
-    return JSONResponse(status_code=429, content={"detail": "Too many requests"})
-
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
-
-@app.get("/health", tags=["meta"])
-@limiter.limit("20/minute")
-def health() -> Dict[str, Any]:
-    return {"status": "ok", "ts": int(time.time())}
 
 # logging
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
