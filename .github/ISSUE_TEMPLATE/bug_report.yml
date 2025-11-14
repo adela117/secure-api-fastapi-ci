@@ -1,0 +1,23 @@
+name: Bug report
+description: Report a problem in the service or CI
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Steps to reproduce, expected vs actual
+      placeholder: "1) ... 2) ...\nExpected: ...\nActual: ..."
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: "OS, Python version, branch/commit"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      render: shell
