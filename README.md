@@ -1,4 +1,6 @@
-# Secure API Starter (FastAPI + CI/DC + Security)
+# Secure API Starter (FastAPI + DevSecOps)
+
+Tiny FastAPI service with real guardrails: rate limiting, header API key, Prometheus metrics, security headers, Docker, and a CI pipeline that actually blocks bad changes (tests, lint, SBOM, dep audit, image vuln scan, baseline DAST).
 
 ![CI](https://img.shields.io/github/actions/workflow/status/adela117/pg-secure-api/ci.yml?label=CI)
 ![License](https://img.shields.io/badge/license-MIT-informational)
@@ -12,6 +14,19 @@ Production-minded FastAPI template:
 - ✅ SBOM is generated (CycloneDX) and dependencies are audited (pip-audit)
 - ✅ A lightweight ZAP scan hits the health endpoint to catch obvious issues
 
+---
+## Endpoints
+
+Base URL (local): `http://127.0.0.1:8000`  
+Swagger UI: `/docs`  
+Metrics (Prometheus): `/metrics`
+
+### Public
+- `GET /health`  
+  Response: `{"status":"ok","ts":<epoch>}`  
+  Rate limited: **20/minute per IP**
+
+---
 ## Quick start
 
 ```bash
