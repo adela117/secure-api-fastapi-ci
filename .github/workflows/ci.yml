@@ -26,16 +26,34 @@ jobs:
       - run: python -m pip install -r requirements.txt -r requirements-dev.txt
       - run: python -m pytest -q
 
+  lint:                      # ✅ style checks (Black + Flake8)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Install linters
+        run: python -m pip install black flake8
+      - name: Run Black (check only)
+        run: black --check .
+      - name: Run Flake8
+        run: flake8 .
+
   build_and_zap:             # ✅ build with Buildx cache, verify /health, run ZAP
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # Enable BuildKit/Buildx so caching actually works on GitHub runners
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Build the image, use GitHub Actions cache, and LOAD it into the local Docker daemon
       - name: Build image (with cache)
         uses: docker/build-push-action@v5
         with:
@@ -46,7 +64,11 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Run container
-        run: docker run -d -p 8000:8000 --name api local/secure-api:ci
+        run: |
+          docker run -d -p 8000:8000 \
+            -e APP_VERSION=${{ github.ref_name }} \
+            -e GIT_COMMIT_SHA=${{ github.sha }} \
+            --name api local/secure-api:ci
 
       - name: Wait for health
         run: |
@@ -59,7 +81,7 @@ jobs:
 
       - name: ZAP Baseline DAST
         uses: zaproxy/action-baseline@v0.15.0
-        # If you do NOT want GitHub Issues created by ZAP, uncomment the next 3 lines:
+        # If you do NOT want GitHub Issues created by ZAP, uncomment:
         # env:
         #   GITHUB_TOKEN: ""
         with:
@@ -75,7 +97,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # SBOM (CycloneDX JSON) without Python CLI drama
       - name: Generate SBOM (CycloneDX via Syft)
         uses: anchore/sbom-action@v0
         with:
@@ -101,16 +122,5 @@ jobs:
       - name: pip-audit (strict)
         run: |
           python -m pip install --upgrade pip
-      lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: '3.11' }
-      - name: Install linters
-        run: python -m pip install black flake8
-      - run: black --check .
-      - run: flake8 .
-
           python -m pip install pip-audit
           pip-audit -r requirements.txt --strict
