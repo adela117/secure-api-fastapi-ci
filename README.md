@@ -1,4 +1,4 @@
-# Secure API Starter (FastAPI + DevSecOps)
+# Secure API Starter (FastAPI + CI/DC + Security)
 
 ![CI](https://img.shields.io/github/actions/workflow/status/adela117/pg-secure-api/ci.yml?label=CI)
 ![License](https://img.shields.io/badge/license-MIT-informational)
@@ -6,11 +6,11 @@
 ![DAST](https://img.shields.io/badge/DAST-ZAP%20baseline-purple)
 
 Production-minded FastAPI template:
-- ✅ Unit tests (pytest)
-- ✅ Code style (Black + Flake8)
-- ✅ Dockerized runtime
-- ✅ SBOM (CycloneDX via Syft) + dependency audit (pip-audit)
-- ✅ ZAP baseline scan on `/health`
+- ✅ Tests run on every push/PR (pytest)
+- ✅ Code style is enforced (Black + Flake8)
+- ✅ App builds and runs in Docker
+- ✅ SBOM is generated (CycloneDX) and dependencies are audited (pip-audit)
+- ✅ A lightweight ZAP scan hits the health endpoint to catch obvious issues
 
 ## Quick start
 
