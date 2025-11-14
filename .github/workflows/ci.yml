@@ -26,24 +26,24 @@ jobs:
       - run: python -m pip install -r requirements.txt -r requirements-dev.txt
       - run: python -m pytest -q
 
-  build_and_zap:             # ✅ build container, verify /health, run ZAP
+  build_and_zap:             # ✅ build with Buildx cache, verify /health, run ZAP
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Docker layer cache
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-buildx-
+      # Enable BuildKit/Buildx so caching actually works on GitHub runners
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Build image
-        run: |
-          docker build \
-            --cache-from type=local,src=/tmp/.buildx-cache \
-            --cache-to   type=local,dest=/tmp/.buildx-cache \
-            -t local/secure-api:ci .
+      # Build the image, use GitHub Actions cache, and LOAD it into the local Docker daemon
+      - name: Build image (with cache)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: local/secure-api:ci
+          load: true                # we need the image locally for `docker run`
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Run container
         run: docker run -d -p 8000:8000 --name api local/secure-api:ci
@@ -70,11 +70,12 @@ jobs:
         if: always()
         run: docker rm -f api
 
-  sbom_and_deps:             # ✅ SBOM via Syft + pip-audit
+  sbom_and_deps:             # ✅ SBOM via Syft + Python SCA
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      # SBOM (CycloneDX JSON) without Python CLI drama
       - name: Generate SBOM (CycloneDX via Syft)
         uses: anchore/sbom-action@v0
         with:
