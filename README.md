@@ -1,17 +1,24 @@
-# Secure API (FastAPI · Docker · CI/CD · DevSecOps)
+# Secure API Starter (FastAPI + DevSecOps)
 
-![CI](https://github.com/adela117/pg-secure-api/actions/workflows/ci.yml/badge.svg)
+![CI](https://img.shields.io/github/actions/workflow/status/adela117/pg-secure-api/ci.yml?label=CI)
+![License](https://img.shields.io/badge/license-MIT-informational)
+![Security](https://img.shields.io/badge/SBOM-CycloneDX-blue)
+![DAST](https://img.shields.io/badge/DAST-ZAP%20baseline-purple)
 
-A tiny but production-style API to demonstrate a secure software delivery pipeline:
-- FastAPI app with health and echo endpoints
-- Containerized build (Docker) with live health probe
-- CI gates: Unit tests · CodeQL (SAST) · ZAP baseline (DAST) · SBOM (CycloneDX) · Python SCA (pip-audit)
-- Protected `main` branch with required checks
+Production-minded FastAPI template:
+- ✅ Unit tests (pytest)
+- ✅ Code style (Black + Flake8)
+- ✅ Dockerized runtime
+- ✅ SBOM (CycloneDX via Syft) + dependency audit (pip-audit)
+- ✅ ZAP baseline scan on `/health`
 
-## Quickstart
-Local:
+## Quick start
+
 ```bash
-python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+# 1) run locally
 pip install -r requirements.txt
-uvicorn app.main:app --host 0.0.0.0 --port 8000
-# open http://localhost:8000/health
+uvicorn app.main:app --reload
+
+# 2) or run in Docker
+docker build -t secure-api .
+docker run -p 8000:8000 secure-api
