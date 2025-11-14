@@ -21,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # security headers
 @app.middleware("http")
 async def set_security_headers(request: Request, call_next):
@@ -31,26 +32,33 @@ async def set_security_headers(request: Request, call_next):
     response.headers["Permissions-Policy"] = "geolocation=(), microphone=()"
     return response
 
+
 # access log
 @app.middleware("http")
 async def access_log(request: Request, call_next):
     start = time.time()
     response = await call_next(request)
     ms = int((time.time() - start) * 1000)
-    log.info("%s %s %s %dms", request.method, request.url.path, response.status_code, ms)
+    log.info(
+        "%s %s %s %dms", request.method, request.url.path, response.status_code, ms
+    )
     return response
+
 
 @app.get("/health", tags=["meta"])
 def health() -> Dict[str, Any]:
     return {"status": "ok", "ts": int(time.time())}
 
+
 class EchoBody(BaseModel):
     message: str
     count: int = 1
 
+
 @app.post("/echo", tags=["demo"])
 def echo(body: EchoBody) -> Dict[str, Any]:
     return {"echo": body.message, "count": body.count, "received_at": int(time.time())}
+
 
 @app.get("/version", tags=["meta"])
 def version() -> Dict[str, Any]:
