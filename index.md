@@ -34,7 +34,6 @@ runtime hardening (API key, rate limit, security headers).
 - ✅ Prometheus `/metrics` + basic API key auth + rate limit
 
 ## Screenshots
-> Put PNGs in `docs/` and these will render.
 ![CI green](docs/ci-green.png)
 
 ## Quick links
